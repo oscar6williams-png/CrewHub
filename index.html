@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>crewhub</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@600&display=swap" rel="stylesheet"/>
+<style>
+:root{--pink:#d4537e;--pink-light:#fbeaf0;--pink-mid:#f4c0d1;--pink-dark:#993556;--text:#3a2030;--text-mid:#a06080;--text-light:#c0a0b0;--white:#ffffff;--off-white:#fff8fb;--border:rgba(212,83,126,0.18);--radius:16px;--font:'Nunito',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--font);background:var(--off-white);color:var(--text);overflow:hidden}
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:240px;flex-shrink:0;background:var(--white);border-right:0.5px solid var(--border);display:flex;flex-direction:column;z-index:10}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.blossom-bg{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.blossom-bg svg{width:100%;height:100%}
+.main-content{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;overflow:hidden}
+.sidebar-header{padding:22px 18px 14px;border-bottom:0.5px solid var(--border)}
+.sidebar-logo{font-family:'Playfair Display',serif;font-size:24px;color:var(--text)}
+.sidebar-logo span{color:var(--pink)}
+.sidebar-sub{font-size:12px;color:var(--text-mid);margin-top:2px}
+.sidebar-section{padding:12px 12px 4px;font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 14px;border-radius:12px;cursor:pointer;margin:2px 8px;transition:background .15s;font-size:13px;font-weight:700;color:var(--text-mid)}
+.nav-item:hover{background:var(--pink-light);color:var(--text)}
+.nav-item.active{background:var(--pink-light);color:var(--pink-dark)}
+.nav-item svg{flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--pink);color:#fff;border-radius:20px;font-size:10px;font-weight:800;padding:2px 7px}
+.sidebar-crew-list{flex:1;overflow-y:auto;padding:4px 8px 8px}
+.crew-nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:10px;cursor:pointer;transition:background .15s}
+.crew-nav-item:hover{background:var(--pink-light)}
+.crew-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
+.crew-nav-name{font-size:13px;font-weight:700;color:var(--text);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crew-nav-role{font-size:10px;color:var(--text-mid)}
+.sidebar-footer{padding:12px 16px 16px;border-top:0.5px solid var(--border)}
+.user-chip{display:flex;align-items:center;gap:10px}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:var(--pink-light);color:var(--pink-dark);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:rgba(255,255,255,0.9);backdrop-filter:blur(12px);border-bottom:0.5px solid var(--border);flex-shrink:0}
+.topbar-title{font-size:19px;font-weight:800;color:var(--text)}
+.topbar-sub{font-size:12px;color:var(--text-mid);margin-top:1px}
+.screen{display:none;flex:1;overflow-y:auto;padding:24px;gap:18px;flex-direction:column;animation:fadeIn .2s ease}
+.screen.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.btn{padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);border:none;transition:opacity .15s,transform .1s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{opacity:.88}.btn:active{transform:scale(.97)}
+.btn-pink{background:var(--pink);color:#fff}
+.btn-outline{background:var(--pink-light);color:var(--pink-dark);border:0.5px solid var(--border)}
+.btn-ghost{background:none;color:var(--text-mid);border:0.5px solid var(--border)}
+.btn-danger{background:#fcebeb;color:#a32d2d}
+.btn-sm{padding:6px 12px;font-size:12px}
+.card{background:rgba(255,255,255,0.88);border:0.5px solid var(--border);border-radius:var(--radius);padding:16px}
+.card-label{font-size:10px;font-weight:800;letter-spacing:.08em;color:var(--text-mid);text-transform:uppercase;margin-bottom:8px}
+.pill{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+.pill-pink{background:var(--pink-light);color:var(--pink-dark)}
+.pill-green{background:#e1f5ee;color:#085041}
+.pill-amber{background:#faeeda;color:#633806}
+.pill-gray{background:#f1efe8;color:#5f5e5a}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat-card{background:rgba(255,255,255,0.88);border:0.5px solid var(--border);border-radius:var(--radius);padding:16px}
+.stat-label{font-size:10px;font-weight:800;color:var(--text-mid);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.stat-num{font-size:32px;font-weight:800;color:var(--text);line-height:1}
+.event-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border)}
+.event-row:last-child{border-bottom:none}
+.event-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.crew-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.crew-card{background:rgba(255,255,255,0.9);border:0.5px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:background .15s,transform .15s}
+.crew-card:hover{background:#fff;transform:translateY(-2px)}
+.crew-card.joined{border-left:3px solid var(--pink)}
+.crew-banner{width:100%;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;margin-bottom:10px}
+.member-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border)}
+.member-row:last-child{border-bottom:none}
+.avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+.req-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:0.5px solid var(--border)}
+.req-row:last-child{border-bottom:none}
+.cal-layout{display:grid;grid-template-columns:320px 1fr;gap:18px;align-items:start}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.day-label{text-align:center;font-size:10px;font-weight:800;color:var(--text-mid);padding:4px 0;text-transform:uppercase;letter-spacing:.05em}
+.day-cell{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:5px;border-radius:9px;cursor:pointer;position:relative;transition:background .15s}
+.day-cell:hover{background:var(--pink-light)}
+.day-cell.today{background:var(--pink)}
+.day-cell.today .day-num{color:#fff}
+.day-cell.other-month .day-num{color:#d8b0c8}
+.day-cell.selected{background:var(--pink-light);border:1.5px solid var(--pink)}
+.day-cell.has-entry::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:var(--pink)}
+.day-cell.today.has-entry::after{background:#fff}
+.day-num{font-size:12px;font-weight:700;color:var(--text);line-height:1}
+.month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.month-label{font-size:15px;font-weight:800;color:var(--text)}
+.nav-arrow{background:none;border:0.5px solid var(--border);border-radius:8px;width:30px;height:30px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--pink);font-size:15px}
+.nav-arrow:hover{background:var(--pink-light)}
+.entry-card{background:#fff;border:0.5px solid var(--border);border-radius:13px;overflow:hidden;margin-bottom:9px}
+.entry-img{width:100%;max-height:160px;object-fit:cover;display:block}
+.entry-body{padding:10px 13px}
+.entry-time{font-size:11px;font-weight:700;color:var(--pink);margin-bottom:2px}
+.entry-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+.entry-note{font-size:12px;color:var(--text-mid);line-height:1.45}
+.add-entry-btn{width:100%;padding:11px;border:0.5px dashed rgba(212,83,126,0.4);border-radius:13px;background:rgba(255,255,255,0.6);color:var(--text-mid);font-size:13px;cursor:pointer;font-family:var(--font);font-weight:700;transition:background .15s}
+.add-entry-btn:hover{background:var(--pink-light);color:var(--pink)}
+.canvas-area{flex:1;position:relative;overflow:hidden;background:rgba(255,248,251,0.6);min-height:380px}
+.free-item{position:absolute;cursor:pointer;user-select:none}
+.free-item.selected .item-inner{outline:2px solid var(--pink);outline-offset:3px;border-radius:6px}
+.item-inner{border-radius:6px}
+.free-img .item-inner{border-radius:12px;overflow:hidden}
+.free-img img{display:block;max-width:200px;border-radius:12px;pointer-events:none}
+.del-btn{position:absolute;top:-9px;left:-9px;width:18px;height:18px;background:var(--pink);border-radius:50%;border:none;cursor:pointer;color:#fff;font-size:9px;display:none;align-items:center;justify-content:center;z-index:5}
+.free-item.selected .del-btn{display:flex}
+.chat-toolbar{flex-shrink:0;background:rgba(255,255,255,0.96);border-top:0.5px solid var(--border)}
+.chat-tabs{display:flex;border-bottom:0.5px solid var(--border)}
+.chat-tab{flex:1;padding:8px 0;font-size:12px;font-weight:700;color:var(--text-light);cursor:pointer;text-align:center;background:none;border:none;font-family:var(--font)}
+.chat-tab.active{color:var(--pink);border-bottom:2px solid var(--pink)}
+.chat-panel{padding:10px 14px 12px;display:none}
+.chat-panel.active{display:block}
+.t-btn{padding:5px 10px;border-radius:20px;border:0.5px solid var(--border);background:var(--off-white);color:var(--text);cursor:pointer;font-size:12px;font-family:var(--font);transition:background .12s}
+.t-btn:hover{background:var(--pink-light)}
+.t-btn.on{background:var(--pink);color:#fff;border-color:var(--pink)}
+.c-dot{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .1s;flex-shrink:0}
+.c-dot:hover{transform:scale(1.12)}
+.c-dot.sel{border-color:var(--text)}
+.o-btn{padding:5px 10px;border-radius:20px;font-size:11px;cursor:pointer;font-family:var(--font);border:0.5px solid var(--border);background:var(--off-white);color:var(--text);font-weight:700}
+.o-btn.on{background:var(--pink);color:#fff;border-color:var(--pink)}
+.pets-scene{position:relative;background:linear-gradient(180deg,#c8e6f5 0%,#d4eef8 35%,#a8d8a8 68%,#7ec87e 100%);border-radius:var(--radius);overflow:hidden;min-height:420px;padding:16px}
+.pet-grass{position:absolute;bottom:0;left:0;right:0;height:160px;background:#7ec87e;border-radius:0 0 var(--radius) var(--radius)}
+.pet-grass-mid{position:absolute;bottom:120px;left:0;right:0;height:50px;background:#96d496;border-radius:50% 50% 0 0/16px 16px 0 0}
+.pets-row{position:relative;z-index:5;display:flex;justify-content:center;gap:20px;align-items:flex-end;padding-bottom:16px;margin-top:8px;flex-wrap:wrap}
+.pet-slot{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
+.pet-label{font-size:10px;font-weight:800;color:#3a2030;background:rgba(255,255,255,0.8);border-radius:20px;padding:2px 9px;white-space:nowrap}
+.pet-container{position:relative;width:76px;height:76px}
+.pet-dead{filter:grayscale(1);opacity:.5}
+.bars{display:flex;flex-direction:column;gap:3px;width:76px}
+.bar-row{display:flex;align-items:center;gap:3px}
+.bar-icon{font-size:9px;width:12px;text-align:center;flex-shrink:0}
+.bar-bg{flex:1;height:4px;background:rgba(0,0,0,0.12);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width .5s}
+.feed-btns{display:flex;gap:3px;margin-top:3px}
+.feed-btn{flex:1;padding:3px 0;border-radius:7px;border:none;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .1s}
+.feed-btn:active{transform:scale(.93)}
+.btn-food{background:#faeeda;color:#633806}
+.btn-water{background:#e6f1fb;color:#0c447c}
+.active-pet-badge{position:absolute;top:-7px;right:-7px;width:16px;height:16px;background:var(--pink);border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center}
+.active-pet-badge::after{content:'';width:5px;height:5px;background:#fff;border-radius:50%}
+.big-pet-wrap{position:absolute;bottom:14px;right:18px;z-index:8;padding-bottom:26px}
+.food-particle{position:absolute;width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:20;animation:floatUp .6s ease-out forwards}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-34px) scale(.3)}}
+.pet-info-row{position:relative;z-index:5;display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.82);border-radius:13px;padding:10px 14px;margin-bottom:10px;flex-wrap:wrap}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(40,10,25,.45);z-index:100;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:20px;padding:26px;max-width:460px;width:100%;max-height:90vh;overflow-y:auto}
+.modal-title{font-size:17px;font-weight:800;color:var(--text);margin-bottom:14px}
+.f-label{font-size:12px;font-weight:700;color:var(--text-mid);margin-bottom:4px;display:block}
+.f-input{width:100%;border:0.5px solid var(--border);border-radius:10px;padding:9px 13px;font-size:13px;background:var(--off-white);color:var(--text);outline:none;font-family:var(--font);margin-bottom:11px}
+.f-input:focus{border-color:var(--pink)}
+textarea.f-input{resize:none;height:68px;line-height:1.5}
+.modal-btns{display:flex;gap:9px;margin-top:6px}
+.modal-btns .btn{flex:1;justify-content:center}
+.img-upload-area{width:100%;height:90px;border:0.5px dashed rgba(212,83,126,.4);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:var(--off-white);margin-bottom:11px;gap:4px;position:relative;overflow:hidden;transition:background .15s}
+.img-upload-area:hover{background:var(--pink-light)}
+.img-upload-area img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:11px;display:none}
+.img-upload-area .hint{font-size:12px;color:var(--text-mid);pointer-events:none}
+.color-pick-row{display:flex;gap:7px;margin-bottom:11px;flex-wrap:wrap}
+.c-swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .1s}
+.c-swatch:hover{transform:scale(1.1)}
+.c-swatch.sel{border-color:var(--text)}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;font-size:13px;font-weight:700;padding:9px 18px;border-radius:20px;z-index:200;opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap}
+.toast.show{opacity:1}
+.inbox-card{background:#fff;border:0.5px solid var(--border);border-radius:var(--radius);padding:13px 15px;margin-bottom:9px}
+.empty-state{text-align:center;padding:44px 20px;color:var(--text-light);font-size:14px;line-height:1.6}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--pink-mid);border-radius:4px}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes blink{0%,90%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes tailWag{0%,100%{transform:rotate(-15deg)}50%{transform:rotate(15deg)}}
+@keyframes bigBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@media(max-width:700px){.sidebar{display:none}.cal-layout{grid-template-columns:1fr}.crew-grid{grid-template-columns:1fr}.stat-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">crew<span>hub</span></div>
+    <div class="sidebar-sub" id="todays-date"></div>
+  </div>
+  <div class="sidebar-section">Menu</div>
+  <div class="nav-item active" onclick="goTo('home',this)" id="nav-home">
+    <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9L10 3L17 9V17H13V13H7V17H3V9Z" stroke-linejoin="round"/></svg>Home
+  </div>
+  <div class="nav-item" onclick="goTo('discover',this)" id="nav-discover">
+    <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="2"/></svg>Discover crews
+  </div>
+  <div class="nav-item" onclick="goTo('calendar',this)" id="nav-calendar">
+    <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="14" height="13" rx="2"/><path d="M7 3V7M13 3V7M3 9H17"/></svg>Calendar
+  </div>
+  <div class="nav-item" onclick="goTo('chat',this)" id="nav-chat">
+    <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4H16V13H10L6 16V13H4V4Z" stroke-linejoin="round"/></svg>Chat canvas
+  </div>
+  <div class="nav-item" onclick="goTo('pets',this)" id="nav-pets">
+    <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="7" cy="6" r="2"/><circle cx="13" cy="6" r="2"/><ellipse cx="10" cy="13" rx="5" ry="4"/><circle cx="4" cy="11" r="1.5"/><circle cx="16" cy="11" r="1.5"/></svg>Crew pets
+    <span class="nav-badge">NEW</span>
+  </div>
+  <div class="nav-item" onclick="goTo('inbox',this)" id="nav-inbox">
+    <svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h12v9H4z" stroke-linejoin="round"/><path d="M4 8l6 4 6-4"/></svg>Leader inbox
+    <span class="nav-badge" id="inbox-badge" style="display:none">0</span>
+  </div>
+  <div class="sidebar-section" style="margin-top:6px">My crews</div>
+  <div class="sidebar-crew-list" id="sidebar-crews"></div>
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="user-avatar">JK</div>
+      <div><div style="font-size:13px;font-weight:700;color:var(--text)">Jordan K.</div><div style="font-size:11px;color:var(--text-mid)">crew leader</div></div>
+    </div>
+  </div>
+</div>
+<div class="main">
+  <div class="blossom-bg">
+    <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+      <rect width="1200" height="800" fill="#f0f8ff"/>
+      <rect y="600" width="1200" height="200" fill="#7ec87e"/>
+      <rect y="580" width="1200" height="40" fill="#96d496"/>
+      <ellipse cx="600" cy="592" rx="650" ry="24" fill="#a8d8a8"/>
+      <rect x="540" y="340" width="26" height="260" fill="#8B5E3C" rx="7"/>
+      <path d="M553,390 Q420,330 315,260 Q345,200 415,232 Q478,292 553,375" fill="#d4537e" opacity=".68"/>
+      <path d="M553,380 Q690,320 800,250 Q820,200 778,222 Q718,278 554,368" fill="#c96aaa" opacity=".68"/>
+      <path d="M553,405 Q395,382 302,350 Q298,312 355,328 Q438,365 552,400" fill="#e070b0" opacity=".62"/>
+      <path d="M553,405 Q714,395 812,362 Q816,322 768,335 Q698,364 554,402" fill="#d4537e" opacity=".62"/>
+      <path d="M553,372 Q486,290 413,218 Q445,185 484,222 Q526,272 554,368" fill="#c96aaa" opacity=".58"/>
+      <path d="M555,372 Q622,285 695,215 Q722,190 732,222 Q712,268 556,370" fill="#e080b0" opacity=".58"/>
+      <circle cx="305" cy="248" r="33" fill="#e080b8" opacity=".38"/>
+      <circle cx="818" cy="238" r="30" fill="#c96aaa" opacity=".38"/>
+      <circle cx="412" cy="210" r="26" fill="#d8619e" opacity=".38"/>
+      <circle cx="692" cy="205" r="25" fill="#cc5595" opacity=".38"/>
+    </svg>
+  </div>
+  <div class="main-content">
+    <div class="topbar">
+      <div><div class="topbar-title" id="topbar-title">Hey crew</div><div class="topbar-sub" id="topbar-sub">Welcome back, Jordan</div></div>
+      <div id="topbar-actions"><button class="btn btn-pink btn-sm" onclick="openModal('modal-create')">+ New crew</button></div>
+    </div>
+
+    <!-- HOME -->
+    <div class="screen active" id="screen-home">
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label">My crews</div><div class="stat-num" id="stat-crews">2</div><div style="font-size:12px;color:var(--text-light);margin-top:3px">joined &amp; leading</div></div>
+        <div class="stat-card"><div class="stat-label">Events this week</div><div class="stat-num">4</div><div style="font-size:12px;color:var(--text-light);margin-top:3px">across all crews</div></div>
+        <div class="stat-card"><div class="stat-label">Pending requests</div><div class="stat-num" id="stat-reqs">2</div><div style="font-size:12px;color:var(--text-light);margin-top:3px">awaiting approval</div></div>
+        <div class="stat-card"><div class="stat-label">Pet streak</div><div class="stat-num" style="color:var(--pink)">7🔥</div><div style="font-size:12px;color:var(--text-light);margin-top:3px">days active</div></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Coming up</div>
+        <div class="event-row"><div class="event-dot" style="background:#d4537e"></div><div style="flex:1;font-size:13px;font-weight:700;color:var(--text)">Football practice</div><div style="text-align:right"><div style="font-size:12px;color:var(--text-mid)">Today 5pm</div><div style="font-size:11px;color:var(--text-light)">Sunday Ballers</div></div></div>
+        <div class="event-row"><div class="event-dot" style="background:#c96aaa"></div><div style="flex:1;font-size:13px;font-weight:700;color:var(--text)">Gaming night</div><div style="text-align:right"><div style="font-size:12px;color:var(--text-mid)">Sat 7pm</div><div style="font-size:11px;color:var(--text-light)">FIFA Night Club</div></div></div>
+        <div class="event-row"><div class="event-dot" style="background:#ba7517"></div><div style="flex:1;font-size:13px;font-weight:700;color:var(--text)">Rooftop drinks</div><div style="text-align:right"><div style="font-size:12px;color:var(--text-mid)">Mon 6pm</div><div style="font-size:11px;color:var(--text-light)">Rooftop Socials</div></div></div>
+        <div class="event-row"><div class="event-dot" style="background:#1d9e75"></div><div style="flex:1;font-size:13px;font-weight:700;color:var(--text)">Book &amp; brunch</div><div style="text-align:right"><div style="font-size:12px;color:var(--text-mid)">Sun 11am</div><div style="font-size:11px;color:var(--text-light)">Book &amp; Brunch</div></div></div>
+      </div>
+    </div>
+
+    <!-- DISCOVER -->
+    <div class="screen" id="screen-discover">
+      <div><input class="f-input" style="margin:0;max-width:340px" id="search-input" placeholder="Search crews..." oninput="renderDiscover()"/></div>
+      <div class="crew-grid" id="discover-list"></div>
+    </div>
+
+    <!-- CREW DETAIL -->
+    <div class="screen" id="screen-crew"><div id="crew-detail-body" style="display:flex;flex-direction:column;gap:14px"></div></div>
+
+    <!-- CALENDAR -->
+    <div class="screen" id="screen-calendar">
+      <div class="cal-layout">
+        <div class="card">
+          <div class="month-nav">
+            <button class="nav-arrow" onclick="changeMonth(-1)">&#8249;</button>
+            <div class="month-label" id="month-label"></div>
+            <button class="nav-arrow" onclick="changeMonth(1)">&#8250;</button>
+          </div>
+          <div class="cal-grid" id="cal-grid">
+            <div class="day-label">Su</div><div class="day-label">Mo</div><div class="day-label">Tu</div><div class="day-label">We</div><div class="day-label">Th</div><div class="day-label">Fr</div><div class="day-label">Sa</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:11px" id="cal-date-header">Select a date</div>
+          <div id="cal-entries"></div>
+          <button class="add-entry-btn" id="add-entry-btn" onclick="openModal('modal-diary')" style="display:none">+ Add memory for this day</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAT CANVAS -->
+    <div class="screen" id="screen-chat" style="padding:0;gap:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 18px;background:rgba(255,255,255,0.88);border-bottom:0.5px solid var(--border);flex-shrink:0">
+        <span style="font-size:12px;color:var(--text-mid);font-weight:700">Tap to select · drag anywhere · × to delete</span>
+        <div id="move-pill" class="btn btn-outline btn-sm" onclick="toggleMoveMode()" style="cursor:pointer">move mode</div>
+      </div>
+      <div class="canvas-area" id="canvas" onclick="canvasClick(event)"></div>
+      <div class="chat-toolbar">
+        <div class="chat-tabs">
+          <button class="chat-tab active" onclick="showChatPanel('panel-text',this)">Text</button>
+          <button class="chat-tab" onclick="showChatPanel('panel-style',this)">Style</button>
+          <button class="chat-tab" onclick="showChatPanel('panel-colour',this)">Colour</button>
+        </div>
+        <div class="chat-panel active" id="panel-text">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px">
+            <button class="btn btn-ghost btn-sm" onclick="changeSize(-2)">−</button>
+            <span style="font-size:12px;color:var(--text-mid);min-width:26px;text-align:center" id="sz-label">22</span>
+            <button class="btn btn-ghost btn-sm" onclick="changeSize(2)">+</button>
+            <span style="font-size:11px;color:var(--text-light)">size</span>
+          </div>
+          <div style="display:flex;gap:7px;align-items:center">
+            <input class="f-input" style="margin:0;flex:1" id="chat-input" placeholder="Type something..." onkeydown="chatKey(event)"/>
+            <button class="btn btn-ghost btn-sm" onclick="triggerChatImg()"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="1" y="3" width="14" height="10" rx="2"/><circle cx="8" cy="8" r="2.5"/><path d="M5 3l1-2h4l1 2"/></svg></button>
+            <button class="btn btn-pink btn-sm" onclick="addChatText()">Add</button>
+          </div>
+        </div>
+        <div class="chat-panel" id="panel-style">
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px">
+            <button class="t-btn" id="btn-bold" onclick="toggleStyle('bold')" style="font-weight:700">B</button>
+            <button class="t-btn" id="btn-italic" onclick="toggleStyle('italic')" style="font-style:italic">I</button>
+            <button class="t-btn" id="btn-underline" onclick="toggleStyle('underline')" style="text-decoration:underline">U</button>
+            <button class="t-btn" id="btn-strike" onclick="toggleStyle('strike')" style="text-decoration:line-through">S</button>
+          </div>
+          <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap">
+            <span style="font-size:11px;color:var(--text-mid)">outline:</span>
+            <button class="o-btn on" id="out-none" onclick="setOutline('none')">none</button>
+            <button class="o-btn" id="out-thin" onclick="setOutline('thin')">thin</button>
+            <button class="o-btn" id="out-thick" onclick="setOutline('thick')">thick</button>
+            <button class="o-btn" id="out-glow" onclick="setOutline('glow')">glow</button>
+          </div>
+        </div>
+        <div class="chat-panel" id="panel-colour">
+          <div style="font-size:11px;color:var(--text-mid);margin-bottom:5px">text colour</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px" id="text-colors"></div>
+          <div style="font-size:11px;color:var(--text-mid);margin-bottom:5px">outline colour</div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap" id="outline-colors"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PETS -->
+    <div class="screen" id="screen-pets">
+      <div class="pets-scene" id="pets-scene">
+        <div class="pet-grass-mid"></div>
+        <div class="pet-grass"></div>
+        <div class="pet-info-row">
+          <div><div style="font-size:24px;font-weight:800;color:var(--pink);line-height:1" id="streak-big">7</div><div style="font-size:10px;font-weight:800;color:var(--text-mid);text-transform:uppercase;letter-spacing:.06em">day streak</div></div>
+          <div style="flex:1;font-size:12px;color:var(--text)">Feed your pets every day to keep the crew streak alive! Hover a pet to open their mouth.</div>
+          <button class="btn btn-outline btn-sm" onclick="addPet()">+ Hatch pet</button>
+        </div>
+        <div class="pets-row" id="pets-row"></div>
+        <div class="big-pet-wrap" id="big-pet-wrap"></div>
+      </div>
+    </div>
+
+    <!-- INBOX -->
+    <div class="screen" id="screen-inbox"><div id="inbox-list"></div></div>
+  </div>
+</div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-create">
+  <div class="modal">
+    <div class="modal-title">Create a new crew</div>
+    <label class="f-label">Crew name</label><input class="f-input" id="new-name" placeholder="e.g. Sunday Ballers"/>
+    <label class="f-label">Description</label><textarea class="f-input" id="new-desc" placeholder="What's this crew about?"></textarea>
+    <label class="f-label">Crew colour</label><div class="color-pick-row" id="crew-color-pick"></div>
+    <label class="f-label">Your name (as leader)</label><input class="f-input" id="new-leader" placeholder="e.g. Jordan K."/>
+    <div class="modal-btns"><button class="btn btn-outline" onclick="closeModal('modal-create')">Cancel</button><button class="btn btn-pink" onclick="createCrew()">Create crew</button></div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-join">
+  <div class="modal">
+    <div class="modal-title" id="join-modal-title">Request to join</div>
+    <div style="font-size:13px;color:var(--text-mid);margin-bottom:11px" id="join-modal-desc"></div>
+    <label class="f-label">Your name</label><input class="f-input" id="join-name" placeholder="e.g. Sam T."/>
+    <label class="f-label">Why do you want to join? (optional)</label><textarea class="f-input" id="join-reason" placeholder="Say hi to the leader..."></textarea>
+    <div class="modal-btns"><button class="btn btn-outline" onclick="closeModal('modal-join')">Cancel</button><button class="btn btn-pink" onclick="submitJoin()">Send request</button></div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-diary">
+  <div class="modal">
+    <div class="modal-title">Add to your diary</div>
+    <div style="font-size:12px;font-weight:700;color:var(--pink);margin-bottom:12px" id="diary-date-label"></div>
+    <label class="f-label">Title</label><input class="f-input" id="diary-title" placeholder="e.g. Picnic with the crew"/>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+      <div><label class="f-label">Time</label><input class="f-input" id="diary-time" type="time"/></div>
+      <div><label class="f-label">Colour</label><select class="f-input" id="diary-color"><option value="#d4537e">Pink</option><option value="#c96aaa">Mauve</option><option value="#1d9e75">Green</option><option value="#378add">Blue</option><option value="#ba7517">Amber</option><option value="#d85a30">Coral</option></select></div>
+    </div>
+    <label class="f-label">Note</label><textarea class="f-input" id="diary-note" placeholder="Write something about this day..."></textarea>
+    <label class="f-label">Photo (optional)</label>
+    <div class="img-upload-area" id="diary-img-area" onclick="triggerDiaryImg()">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="#d4537e" stroke-width="1.4"><rect x="2" y="5" width="18" height="14" rx="3"/><circle cx="11" cy="12" r="3.5"/><path d="M7 5l1.5-2h5L15 5"/></svg>
+      <div class="hint">Click to add a photo</div>
+      <img id="diary-img-preview" src="" alt=""/>
+    </div>
+    <input type="file" id="diary-img-file" accept="image/*" style="display:none" onchange="handleDiaryImg(event)"/>
+    <div class="modal-btns"><button class="btn btn-outline" onclick="closeModal('modal-diary')">Cancel</button><button class="btn btn-pink" onclick="saveDiaryEntry()">Save</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<input type="file" id="chat-img-file" accept="image/*" multiple style="display:none" onchange="handleChatImgs(event)"/>
+<script src="app.js"></script>
+<script src="spline-pet.js"></script>
+</body>
+</html>
