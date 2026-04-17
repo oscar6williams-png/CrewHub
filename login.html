@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>crewhub — sign in</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@600&display=swap" rel="stylesheet"/>
+<style>
+:root{--pink:#d4537e;--pink-light:#fbeaf0;--pink-mid:#f4c0d1;--pink-dark:#993556;--text:#3a2030;--text-mid:#a06080;--text-light:#c0a0b0;--border:rgba(212,83,126,0.18);--font:'Nunito',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:var(--font);overflow:hidden}
+.bg{position:fixed;inset:0;z-index:0}
+.bg svg{width:100%;height:100%}
+.page{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{background:rgba(255,255,255,0.93);border-radius:24px;padding:36px 34px;width:100%;max-width:420px;border:0.5px solid var(--border)}
+.logo{font-family:'Playfair Display',serif;font-size:30px;color:var(--text);text-align:center;margin-bottom:3px}
+.logo span{color:var(--pink)}
+.tagline{text-align:center;font-size:12px;color:var(--text-mid);margin-bottom:22px}
+.tabs{display:flex;background:var(--pink-light);border-radius:20px;padding:3px;margin-bottom:20px}
+.tab{flex:1;padding:8px;border-radius:17px;border:none;background:none;font-family:var(--font);font-size:13px;font-weight:700;color:var(--text-mid);cursor:pointer;transition:all .2s}
+.tab.active{background:#fff;color:var(--pink-dark)}
+.f-label{font-size:12px;font-weight:700;color:var(--text-mid);margin-bottom:4px;display:block}
+.f-input{width:100%;border:0.5px solid var(--border);border-radius:12px;padding:11px 14px;font-size:14px;background:#fff8fb;color:var(--text);outline:none;font-family:var(--font);margin-bottom:12px;transition:border-color .15s}
+.f-input:focus{border-color:var(--pink)}
+.btn-main{width:100%;padding:13px;border-radius:20px;border:none;background:var(--pink);color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:var(--font);transition:opacity .15s;margin-top:2px}
+.btn-main:hover{opacity:.88}
+.btn-main:disabled{opacity:.5;cursor:not-allowed}
+.msg{border-radius:12px;padding:10px 14px;font-size:13px;font-weight:600;margin-bottom:12px;display:none}
+.msg.show{display:block}
+.msg.error{background:#fcebeb;color:#a32d2d}
+.msg.success{background:#e1f5ee;color:#085041}
+.msg.warning{background:#faeeda;color:#633806}
+.msg.info{background:#eeedfe;color:#3c3489}
+.loading{display:inline-block;width:16px;height:16px;border:2.5px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes blink{0%,90%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+.pet-row{display:flex;justify-content:center;gap:10px;margin-bottom:18px}
+
+/* PENDING / DENIED screens */
+.status-screen{display:none;text-align:center;padding:10px 0}
+.status-screen.show{display:block}
+.status-icon{font-size:48px;margin-bottom:12px}
+.status-title{font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px}
+.status-desc{font-size:13px;color:var(--text-mid);line-height:1.6;margin-bottom:20px}
+.btn-back{padding:9px 20px;border-radius:20px;border:0.5px solid var(--border);background:none;color:var(--text-mid);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)}
+</style>
+</head>
+<body>
+<div class="bg">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+    <rect width="1200" height="800" fill="#f0f8ff"/>
+    <rect y="600" width="1200" height="200" fill="#7ec87e"/>
+    <rect y="580" width="1200" height="40" fill="#96d496"/>
+    <ellipse cx="600" cy="592" rx="650" ry="24" fill="#a8d8a8"/>
+    <rect x="540" y="300" width="26" height="300" fill="#8B5E3C" rx="7"/>
+    <path d="M553,370 Q420,310 315,240 Q345,180 415,212 Q478,272 553,355" fill="#d4537e" opacity=".7"/>
+    <path d="M553,360 Q690,300 800,230 Q820,180 778,202 Q718,258 554,348" fill="#c96aaa" opacity=".7"/>
+    <path d="M553,385 Q395,362 302,330 Q298,292 355,308 Q438,345 552,380" fill="#e070b0" opacity=".65"/>
+    <path d="M553,385 Q714,375 812,342 Q816,302 768,315 Q698,344 554,382" fill="#d4537e" opacity=".65"/>
+    <circle cx="305" cy="228" r="30" fill="#e080b8" opacity=".4"/>
+    <circle cx="818" cy="218" r="28" fill="#c96aaa" opacity=".4"/>
+    <circle cx="412" cy="190" r="24" fill="#d8619e" opacity=".4"/>
+    <circle cx="692" cy="185" r="23" fill="#cc5595" opacity=".4"/>
+  </svg>
+</div>
+
+<div class="page">
+  <div class="card">
+    <div class="logo">crew<span>hub</span></div>
+    <div class="tagline">your crew, your world 🌸</div>
+    <div class="pet-row" id="login-pets"></div>
+
+    <!-- Main auth forms -->
+    <div id="auth-section">
+      <div class="tabs">
+        <button class="tab active" onclick="showTab('signin')" id="tab-signin">Sign in</button>
+        <button class="tab" onclick="showTab('signup')" id="tab-signup">Create account</button>
+      </div>
+
+      <!-- SIGN IN -->
+      <div id="form-signin">
+        <div class="msg error" id="signin-error"></div>
+        <label class="f-label">Email</label>
+        <input class="f-input" id="signin-email" type="email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doSignIn()"/>
+        <label class="f-label">Password</label>
+        <input class="f-input" id="signin-password" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doSignIn()"/>
+        <button class="btn-main" id="signin-btn" onclick="doSignIn()">Sign in</button>
+      </div>
+
+      <!-- SIGN UP -->
+      <div id="form-signup" style="display:none">
+        <div class="msg error" id="signup-error"></div>
+        <div class="msg success" id="signup-success"></div>
+        <div class="msg info" id="signup-info" style="display:block">
+          🔐 A crewhub admin must approve your account before you can access the app.
+        </div>
+        <label class="f-label">Your name</label>
+        <input class="f-input" id="signup-username" type="text" placeholder="e.g. Jordan K." onkeydown="if(event.key==='Enter')doSignUp()"/>
+        <label class="f-label">Email</label>
+        <input class="f-input" id="signup-email" type="email" placeholder="you@example.com" onkeydown="if(event.key==='Enter')doSignUp()"/>
+        <label class="f-label">Password</label>
+        <input class="f-input" id="signup-password" type="password" placeholder="min 6 characters" onkeydown="if(event.key==='Enter')doSignUp()"/>
+        <button class="btn-main" id="signup-btn" onclick="doSignUp()">Request access</button>
+      </div>
+    </div>
+
+    <!-- PENDING screen -->
+    <div class="status-screen" id="screen-pending">
+      <div class="status-icon">⏳</div>
+      <div class="status-title">Request sent!</div>
+      <div class="status-desc">Your account is waiting for approval from the crewhub admin. Check back soon — you'll be able to sign in once approved!</div>
+      <button class="btn-back" onclick="showAuth()">Back to sign in</button>
+    </div>
+
+    <!-- DENIED screen -->
+    <div class="status-screen" id="screen-denied">
+      <div class="status-icon">❌</div>
+      <div class="status-title">Access denied</div>
+      <div class="status-desc">Your access request was declined by the admin. Contact them directly if you think this was a mistake.</div>
+      <button class="btn-back" onclick="showAuth()">Back</button>
+    </div>
+
+    <!-- AWAITING APPROVAL (already signed up, not yet approved) -->
+    <div class="status-screen" id="screen-awaiting">
+      <div class="status-icon">🌸</div>
+      <div class="status-title">Almost there!</div>
+      <div class="status-desc">You're signed in but waiting for admin approval. Come back once the admin has approved your account!</div>
+      <button class="btn-back" onclick="doLogoutLogin()">Sign out</button>
+    </div>
+  </div>
+</div>
+
+<script src="auth.js"></script>
+<script>
+function showTab(tab) {
+  document.getElementById('form-signin').style.display = tab==='signin'?'':'none';
+  document.getElementById('form-signup').style.display = tab==='signup'?'':'none';
+  document.getElementById('tab-signin').classList.toggle('active', tab==='signin');
+  document.getElementById('tab-signup').classList.toggle('active', tab==='signup');
+}
+function showAuth() {
+  document.getElementById('auth-section').style.display='';
+  document.querySelectorAll('.status-screen').forEach(s=>s.classList.remove('show'));
+}
+function showStatus(id) {
+  document.getElementById('auth-section').style.display='none';
+  document.querySelectorAll('.status-screen').forEach(s=>s.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+}
+function setLoading(btnId, loading, text) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  btn.innerHTML = loading ? `<span class="loading"></span>${text}` : text;
+}
+async function doLogoutLogin() {
+  await signOut();
+  location.reload();
+}
+
+// Check if already logged in
+if (currentUser) {
+  const email = currentUser.email;
+  if (email === ADMIN_EMAIL || isApproved(email)) {
+    window.location.href = 'index.html';
+  } else if (isDenied(email)) {
+    showStatus('screen-denied');
+  } else {
+    showStatus('screen-awaiting');
+  }
+}
+
+async function doSignIn() {
+  const email = document.getElementById('signin-email').value.trim();
+  const pass = document.getElementById('signin-password').value;
+  const err = document.getElementById('signin-error');
+  err.classList.remove('show');
+  if (!email || !pass) { err.textContent='Please fill in all fields'; err.classList.add('show'); return; }
+  setLoading('signin-btn', true, 'Signing in...');
+  try {
+    await signIn(email, pass);
+    // Check approval status
+    if (email === ADMIN_EMAIL || isApproved(email)) {
+      window.location.href = 'index.html';
+    } else if (isDenied(email)) {
+      showStatus('screen-denied');
+      setLoading('signin-btn', false, 'Sign in');
+    } else if (isPending(email)) {
+      showStatus('screen-pending');
+      setLoading('signin-btn', false, 'Sign in');
+    } else {
+      showStatus('screen-awaiting');
+      setLoading('signin-btn', false, 'Sign in');
+    }
+  } catch(e) {
+    err.textContent = e.message || 'Could not sign in — check your email and password';
+    err.classList.add('show');
+    setLoading('signin-btn', false, 'Sign in');
+  }
+}
+
+async function doSignUp() {
+  const username = document.getElementById('signup-username').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pass = document.getElementById('signup-password').value;
+  const err = document.getElementById('signup-error');
+  const suc = document.getElementById('signup-success');
+  err.classList.remove('show'); suc.classList.remove('show');
+  if (!username||!email||!pass) { err.textContent='Please fill in all fields'; err.classList.add('show'); return; }
+  if (pass.length<6) { err.textContent='Password must be at least 6 characters'; err.classList.add('show'); return; }
+  setLoading('signup-btn', true, 'Requesting access...');
+  try {
+    const result = await signUp(email, pass, username);
+    // Register as pending
+    requestAccess(email, username);
+    if (email === ADMIN_EMAIL) {
+      window.location.href = 'index.html';
+    } else {
+      showStatus('screen-pending');
+    }
+    setLoading('signup-btn', false, 'Request access');
+  } catch(e) {
+    // If already registered, just add to pending
+    if (e.message && e.message.toLowerCase().includes('already')) {
+      requestAccess(email, username);
+      showStatus('screen-pending');
+    } else {
+      err.textContent = e.message || 'Could not create account';
+      err.classList.add('show');
+    }
+    setLoading('signup-btn', false, 'Request access');
+  }
+}
+
+// Draw pets
+function drawLoginPet(type,bodyColor,cheekColor,earColor,eyeColor,size=50,delay=0){
+  const s=size,cx=s/2,cy=s/2+2,ol='#3a2030';
+  let ears='';
+  if(type==='bunny'){ears=`<ellipse cx="${cx-9}" cy="${cy-17}" rx="4" ry="8.5" fill="${earColor}" stroke="${ol}" stroke-width="1"/><ellipse cx="${cx-9}" cy="${cy-17}" rx="2.2" ry="5" fill="${cheekColor}" opacity=".5"/><ellipse cx="${cx+9}" cy="${cy-17}" rx="4" ry="8.5" fill="${earColor}" stroke="${ol}" stroke-width="1"/><ellipse cx="${cx+9}" cy="${cy-17}" rx="2.2" ry="5" fill="${cheekColor}" opacity=".5"/>`;}
+  else if(type==='bear'){ears=`<circle cx="${cx-11}" cy="${cy-13}" r="5.5" fill="${earColor}" stroke="${ol}" stroke-width="1"/><circle cx="${cx-11}" cy="${cy-13}" r="3" fill="${cheekColor}" opacity=".5"/><circle cx="${cx+11}" cy="${cy-13}" r="5.5" fill="${earColor}" stroke="${ol}" stroke-width="1"/><circle cx="${cx+11}" cy="${cy-13}" r="3" fill="${cheekColor}" opacity=".5"/>`;}
+  else{ears=`<polygon points="${cx-12},${cy-13} ${cx-7},${cy-22} ${cx-2},${cy-13}" fill="${earColor}" stroke="${ol}" stroke-width="1"/><polygon points="${cx+12},${cy-13} ${cx+7},${cy-22} ${cx+2},${cy-13}" fill="${earColor}" stroke="${ol}" stroke-width="1"/>`;}
+  return `<svg width="${s}" height="${s}" viewBox="0 0 ${s} ${s}" xmlns="http://www.w3.org/2000/svg" style="animation:bounce 1.4s ease-in-out infinite;animation-delay:${delay}s">
+    <g>${ears}<ellipse cx="${cx}" cy="${cy}" rx="15" ry="14" fill="${bodyColor}" stroke="${ol}" stroke-width="1.1"/>
+    <ellipse cx="${cx-8}" cy="${cy}" rx="2.8" ry="2" fill="${cheekColor}" opacity=".4"/>
+    <ellipse cx="${cx+8}" cy="${cy}" rx="2.8" ry="2" fill="${cheekColor}" opacity=".4"/>
+    <ellipse cx="${cx-5.5}" cy="${cy-3}" rx="2.3" ry="2.8" fill="${eyeColor}" style="animation:blink 3s ease-in-out infinite"/>
+    <ellipse cx="${cx-4.5}" cy="${cy-4}" rx=".8" ry=".8" fill="white"/>
+    <ellipse cx="${cx+5.5}" cy="${cy-3}" rx="2.3" ry="2.8" fill="${eyeColor}" style="animation:blink 3s ease-in-out infinite .15s"/>
+    <ellipse cx="${cx+6.5}" cy="${cy-4}" rx=".8" ry=".8" fill="white"/>
+    <ellipse cx="${cx}" cy="${cy+1}" rx="1.6" ry="1.2" fill="${cheekColor}"/>
+    <path d="M${cx-3.5} ${cy+4.5} Q${cx} ${cy+7.5} ${cx+3.5} ${cy+4.5}" fill="none" stroke="${eyeColor}" stroke-width="1" stroke-linecap="round"/>
+    </g></svg>`;
+}
+const petRow = document.getElementById('login-pets');
+[
+  {type:'bunny',body:'#f4c0d1',cheek:'#e88fab',ear:'#edaac4',eye:'#3a2030'},
+  {type:'bear',body:'#faeeda',cheek:'#fac775',ear:'#f4c0d1',eye:'#3a2030'},
+  {type:'cat',body:'#9fe1cb',cheek:'#5dcaa5',ear:'#9fe1cb',eye:'#085041'},
+  {type:'bunny',body:'#cecbf6',cheek:'#afa9ec',ear:'#cecbf6',eye:'#3c3489'},
+].forEach((p,i) => {
+  const div=document.createElement('div');
+  div.innerHTML=drawLoginPet(p.type,p.body,p.cheek,p.ear,p.eye,48,i*0.2);
+  petRow.appendChild(div);
+});
+</script>
+</body>
+</html>

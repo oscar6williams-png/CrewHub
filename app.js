@@ -1,3 +1,39 @@
+// ═══ AUTH GUARD ══════════════════════════════════════
+if (typeof currentUser !== 'undefined') {
+  if (!currentUser) {
+    window.location.href = 'login.html';
+  } else if (currentUser.email !== ADMIN_EMAIL && !isApproved(currentUser.email)) {
+    window.location.href = 'login.html';
+  }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (typeof getUserName === 'function') {
+    const unEl = document.getElementById('sidebar-username');
+    const emEl = document.getElementById('sidebar-email');
+    const avEl = document.querySelector('.user-avatar');
+    if (unEl) unEl.textContent = getUserName();
+    if (emEl) emEl.textContent = getUserEmail();
+    if (avEl) avEl.textContent = getUserInitials();
+    // Show admin link if admin
+    if (typeof isAdmin === 'function' && isAdmin()) {
+      const footer = document.querySelector('.sidebar-footer');
+      if (footer) {
+        const adminLink = document.createElement('a');
+        adminLink.href = 'admin.html';
+        adminLink.style.cssText = 'display:block;margin-top:6px;text-align:center;font-size:11px;font-weight:800;color:var(--pink);text-decoration:none;padding:5px;border-radius:10px;background:var(--pink-light)';
+        adminLink.textContent = '⚙️ Admin panel';
+        footer.appendChild(adminLink);
+      }
+    }
+  }
+});
+
+async function doLogout() {
+  if (typeof signOut === 'function') await signOut();
+  window.location.href = 'login.html';
+}
+
 // ═══════════════════════════════════════════════════════
 // CREWHUB — app.js
 // ═══════════════════════════════════════════════════════

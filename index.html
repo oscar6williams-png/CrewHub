@@ -351,6 +351,8 @@ textarea.f-input{resize:none;height:68px;line-height:1.5}
     <!-- INBOX -->
     <div class="screen" id="screen-inbox"><div id="inbox-list"></div></div>
   </div>
+    <button onclick="doLogout()" style="margin-top:10px;width:100%;padding:8px;border-radius:20px;border:0.5px solid var(--border);background:none;color:var(--text-mid);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">Sign out</button>
+</div>
 </div>
 </div>
 
@@ -397,6 +399,7 @@ textarea.f-input{resize:none;height:68px;line-height:1.5}
 
 <div class="toast" id="toast"></div>
 <input type="file" id="chat-img-file" accept="image/*" multiple style="display:none" onchange="handleChatImgs(event)"/>
+<script src="auth.js"></script>
 <script src="app.js"></script>
 <script src="spline-pet.js"></script>
 </body>
