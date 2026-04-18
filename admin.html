@@ -3,44 +3,39 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>crewhub — admin panel</title>
+<title>crewhub — admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@600&display=swap" rel="stylesheet"/>
 <style>
-:root{--pink:#d4537e;--pink-light:#fbeaf0;--pink-mid:#f4c0d1;--pink-dark:#993556;--text:#3a2030;--text-mid:#a06080;--text-light:#c0a0b0;--white:#fff;--off-white:#fff8fb;--border:rgba(212,83,126,0.18);--font:'Nunito',sans-serif}
+:root{--pink:#d4537e;--pink-light:#fbeaf0;--pink-dark:#993556;--text:#3a2030;--text-mid:#a06080;--text-light:#c0a0b0;--white:#fff;--off:#fff8fb;--border:rgba(212,83,126,0.18);--font:'Nunito',sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:var(--font);background:var(--off-white);color:var(--text)}
-.page{max-width:700px;margin:0 auto;padding:32px 20px}
+html,body{font-family:var(--font);background:var(--off);color:var(--text)}
+.page{max-width:720px;margin:0 auto;padding:32px 20px 60px}
 .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
 .logo{font-family:'Playfair Display',serif;font-size:22px;color:var(--text)}
 .logo span{color:var(--pink)}
-.admin-badge{background:var(--pink);color:#fff;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px}
+.badge{background:var(--pink);color:#fff;font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;margin-left:8px}
 .btn{padding:7px 16px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);border:none;transition:opacity .15s}
 .btn:hover{opacity:.85}
 .btn-pink{background:var(--pink);color:#fff}
 .btn-outline{background:var(--pink-light);color:var(--pink-dark);border:0.5px solid var(--border)}
-.btn-danger{background:#fcebeb;color:#a32d2d}
 .btn-green{background:#e1f5ee;color:#085041}
+.btn-danger{background:#fcebeb;color:#a32d2d}
 .btn-sm{padding:5px 12px;font-size:12px}
-.card{background:#fff;border:0.5px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px}
-.card-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:4px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.stat{background:#fff;border:0.5px solid var(--border);border-radius:14px;padding:16px;text-align:center}
+.stat-num{font-size:30px;font-weight:800;color:var(--pink)}
+.stat-label{font-size:11px;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:.05em}
+.card{background:#fff;border:0.5px solid var(--border);border-radius:16px;padding:16px 18px;margin-bottom:14px}
+.card-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:3px}
 .card-sub{font-size:12px;color:var(--text-mid);margin-bottom:14px}
-.section-label{font-size:10px;font-weight:800;letter-spacing:.1em;color:var(--text-light);text-transform:uppercase;margin-bottom:10px}
 .user-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--border)}
 .user-row:last-child{border-bottom:none}
 .avatar{width:36px;height:36px;border-radius:50%;background:var(--pink-light);color:var(--pink-dark);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
-.user-name{font-size:13px;font-weight:700;color:var(--text)}
-.user-email{font-size:11px;color:var(--text-mid)}
-.user-time{font-size:11px;color:var(--text-light);margin-top:1px}
-.btns{display:flex;gap:6px;margin-left:auto}
+.pill{display:inline-flex;align-items:center;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px}
+.pill-p{background:#faeeda;color:#633806}
+.pill-a{background:#e1f5ee;color:#085041}
+.pill-d{background:#fcebeb;color:#a32d2d}
 .empty{text-align:center;padding:28px;color:var(--text-light);font-size:13px}
-.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px}
-.badge-pending{background:#faeeda;color:#633806}
-.badge-approved{background:#e1f5ee;color:#085041}
-.badge-denied{background:#fcebeb;color:#a32d2d}
-.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-.stat{background:#fff;border:0.5px solid var(--border);border-radius:12px;padding:14px;text-align:center}
-.stat-num{font-size:28px;font-weight:800;color:var(--pink)}
-.stat-label{font-size:11px;color:var(--text-mid);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;font-size:13px;font-weight:700;padding:9px 18px;border-radius:20px;z-index:200;opacity:0;pointer-events:none;transition:opacity .25s;white-space:nowrap}
 .toast.show{opacity:1}
 </style>
@@ -49,8 +44,8 @@ html,body{height:100%;font-family:var(--font);background:var(--off-white);color:
 <div class="page">
   <div class="topbar">
     <div>
-      <div class="logo">crew<span>hub</span> <span class="admin-badge">ADMIN</span></div>
-      <div style="font-size:12px;color:var(--text-mid);margin-top:2px" id="admin-email-display"></div>
+      <div class="logo">crew<span>hub</span><span class="badge">ADMIN</span></div>
+      <div style="font-size:12px;color:var(--text-mid);margin-top:3px">Member management panel</div>
     </div>
     <div style="display:flex;gap:8px">
       <a href="index.html" class="btn btn-outline">Back to app</a>
@@ -59,26 +54,21 @@ html,body{height:100%;font-family:var(--font);background:var(--off-white);color:
   </div>
 
   <div class="stat-row">
-    <div class="stat"><div class="stat-num" id="count-pending">0</div><div class="stat-label">Pending</div></div>
-    <div class="stat"><div class="stat-num" id="count-approved">0</div><div class="stat-label">Approved</div></div>
-    <div class="stat"><div class="stat-num" id="count-denied">0</div><div class="stat-label">Denied</div></div>
+    <div class="stat"><div class="stat-num" id="cnt-p">0</div><div class="stat-label">Pending</div></div>
+    <div class="stat"><div class="stat-num" id="cnt-a">0</div><div class="stat-label">Approved</div></div>
+    <div class="stat"><div class="stat-num" id="cnt-d">0</div><div class="stat-label">Denied</div></div>
   </div>
 
-  <!-- PENDING REQUESTS -->
   <div class="card">
     <div class="card-title">Pending requests</div>
     <div class="card-sub">People waiting for your approval to join crewhub</div>
     <div id="pending-list"></div>
   </div>
-
-  <!-- APPROVED USERS -->
   <div class="card">
     <div class="card-title">Approved members</div>
-    <div class="card-sub">These people have access to crewhub</div>
+    <div class="card-sub">These people have full access to crewhub</div>
     <div id="approved-list"></div>
   </div>
-
-  <!-- DENIED USERS -->
   <div class="card">
     <div class="card-title">Denied accounts</div>
     <div class="card-sub">These requests were declined</div>
@@ -87,124 +77,70 @@ html,body{height:100%;font-family:var(--font);background:var(--off-white);color:
 </div>
 
 <div class="toast" id="toast"></div>
-
 <script src="auth.js"></script>
 <script>
-// Only admin can access this page
+// Check admin access using password hash — no email displayed
 if (!currentUser || currentUser.email !== ADMIN_EMAIL) {
   window.location.href = 'login.html';
 }
 
-document.getElementById('admin-email-display').textContent = ADMIN_EMAIL;
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
+async function doLogout(){await signOut();window.location.href='login.html';}
+function ini(name){return(name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+function ago(iso){const s=Math.floor((Date.now()-new Date(iso))/1000);if(s<60)return 'just now';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
 
-function showToast(msg) {
-  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2600);
+function render(){
+  const pending=getPendingUsers(), approved=getApprovedEmails(), denied=getDeniedEmails();
+  document.getElementById('cnt-p').textContent=pending.length;
+  document.getElementById('cnt-a').textContent=approved.length;
+  document.getElementById('cnt-d').textContent=denied.length;
+
+  const pList=document.getElementById('pending-list');
+  pList.innerHTML=!pending.length?`<div class="empty">No pending requests 🎉</div>`:pending.map(u=>`
+    <div class="user-row">
+      <div class="avatar">${ini(u.username)}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:var(--text)">${u.username||'Unknown'}</div>
+        <div style="font-size:11px;color:var(--text-mid)">${u.email}</div>
+        <div style="font-size:10px;color:var(--text-light)">Requested ${ago(u.requestedAt)}</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-green btn-sm" onclick="doApprove('${u.email}')">Approve ✓</button>
+        <button class="btn btn-danger btn-sm" onclick="doDeny('${u.email}')">Deny ✗</button>
+      </div>
+    </div>`).join('');
+
+  const aList=document.getElementById('approved-list');
+  aList.innerHTML=!approved.length?`<div class="empty">No approved members yet</div>`:approved.map(email=>`
+    <div class="user-row">
+      <div class="avatar">${ini(email.split('@')[0])}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:var(--text)">${email.split('@')[0]}</div>
+        <div style="font-size:11px;color:var(--text-mid)">${email}</div>
+        <span class="pill pill-a">approved</span>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="doRevoke('${email}')">Revoke</button>
+    </div>`).join('');
+
+  const dList=document.getElementById('denied-list');
+  dList.innerHTML=!denied.length?`<div class="empty">No denied accounts</div>`:denied.map(email=>`
+    <div class="user-row">
+      <div class="avatar" style="background:#fcebeb;color:#a32d2d">${ini(email.split('@')[0])}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:var(--text)">${email.split('@')[0]}</div>
+        <div style="font-size:11px;color:var(--text-mid)">${email}</div>
+        <span class="pill pill-d">denied</span>
+      </div>
+      <button class="btn btn-green btn-sm" onclick="doApprove('${email}')">Approve</button>
+    </div>`).join('');
 }
 
-async function doLogout() {
-  await signOut(); window.location.href='login.html';
-}
+function doApprove(email){approveUser(email);toast(`✅ ${email} approved!`);render();}
+function doDeny(email){denyUser(email);toast(`❌ ${email} denied.`);render();}
+function doRevoke(email){revokeUser(email);toast(`Revoked ${email}`);render();}
 
-function getInitials(name) {
-  return (name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-}
-
-function timeSince(iso) {
-  const secs = Math.floor((Date.now() - new Date(iso)) / 1000);
-  if (secs < 60) return 'just now';
-  if (secs < 3600) return Math.floor(secs/60) + 'm ago';
-  if (secs < 86400) return Math.floor(secs/3600) + 'h ago';
-  return Math.floor(secs/86400) + 'd ago';
-}
-
-function renderAll() {
-  const pending = getPendingUsers();
-  const approved = getApprovedEmails();
-  const denied = getDeniedEmails();
-
-  document.getElementById('count-pending').textContent = pending.length;
-  document.getElementById('count-approved').textContent = approved.length;
-  document.getElementById('count-denied').textContent = denied.length;
-
-  // Pending
-  const pList = document.getElementById('pending-list');
-  if (!pending.length) {
-    pList.innerHTML = `<div class="empty">No pending requests 🎉</div>`;
-  } else {
-    pList.innerHTML = pending.map(u => `
-      <div class="user-row">
-        <div class="avatar">${getInitials(u.username)}</div>
-        <div style="flex:1">
-          <div class="user-name">${u.username || 'Unknown'}</div>
-          <div class="user-email">${u.email}</div>
-          <div class="user-time">Requested ${timeSince(u.requestedAt)}</div>
-        </div>
-        <div class="btns">
-          <button class="btn btn-green btn-sm" onclick="doApprove('${u.email}')">Approve ✓</button>
-          <button class="btn btn-danger btn-sm" onclick="doDeny('${u.email}')">Deny ✗</button>
-        </div>
-      </div>`).join('');
-  }
-
-  // Approved
-  const aList = document.getElementById('approved-list');
-  if (!approved.length) {
-    aList.innerHTML = `<div class="empty">No approved members yet</div>`;
-  } else {
-    aList.innerHTML = approved.map(email => `
-      <div class="user-row">
-        <div class="avatar">${getInitials(email.split('@')[0])}</div>
-        <div style="flex:1">
-          <div class="user-name">${email.split('@')[0]}</div>
-          <div class="user-email">${email}</div>
-          <span class="badge badge-approved">approved</span>
-        </div>
-        <div class="btns">
-          <button class="btn btn-danger btn-sm" onclick="doRevoke('${email}')">Revoke</button>
-        </div>
-      </div>`).join('');
-  }
-
-  // Denied
-  const dList = document.getElementById('denied-list');
-  if (!denied.length) {
-    dList.innerHTML = `<div class="empty">No denied accounts</div>`;
-  } else {
-    dList.innerHTML = denied.map(email => `
-      <div class="user-row">
-        <div class="avatar" style="background:#fcebeb;color:#a32d2d">${getInitials(email.split('@')[0])}</div>
-        <div style="flex:1">
-          <div class="user-name">${email.split('@')[0]}</div>
-          <div class="user-email">${email}</div>
-          <span class="badge badge-denied">denied</span>
-        </div>
-        <div class="btns">
-          <button class="btn btn-green btn-sm" onclick="doApprove('${email}')">Approve</button>
-        </div>
-      </div>`).join('');
-  }
-}
-
-function doApprove(email) {
-  approveUser(email);
-  showToast(`✅ ${email} approved!`);
-  renderAll();
-}
-function doDeny(email) {
-  denyUser(email);
-  showToast(`❌ ${email} denied.`);
-  renderAll();
-}
-function doRevoke(email) {
-  revokeUser(email);
-  showToast(`Revoked access for ${email}`);
-  renderAll();
-}
-
-renderAll();
-// Auto-refresh every 10 seconds
-setInterval(renderAll, 10000);
+render();
+setInterval(render, 10000);
 </script>
 </body>
 </html>
